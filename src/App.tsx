@@ -47,6 +47,8 @@ export default function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
 
+  console.log(import.meta.env.VITE_HISTORY_LENGTH);
+
   const conversation_history = useRef<MessageHistory[]>([]);
 
   const gptResponse = useRef<null | ((input: string) => Promise<string>)>(async (input: string) => {
