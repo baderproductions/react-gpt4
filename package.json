@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.7.14",
+    "@types/crypto-js": "^4.1.1",
     "@types/lodash": "^4.14.194",
     "axios": "^1.4.0",
+    "crypto-js": "^4.1.1",
     "formik": "^2.2.9",
     "highlight.js": "^11.8.0",
     "lodash": "^4.17.21",

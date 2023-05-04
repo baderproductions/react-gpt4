@@ -1,7 +1,8 @@
-import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react"
 import logo from '../public/logo.png'
-import hljs from 'highlight.js';
-import axios from "axios";
+import CryptoJS from "crypto-js";
+import hljs from 'highlight.js'
+import axios from "axios"
 
 type Message = {
   from: 'user' | 'gpt';
@@ -43,6 +44,8 @@ const HighlightedCode = ({ code }: { code: string }) => {
 const SYSTEM_MESSAGE = 'You are an AI programming assistant. Follow the user requirements carefully & to the letter. Then output the code in a single code block. Minimize any other prose.';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
   const [rows, setRows] = useState(1);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
@@ -130,9 +133,30 @@ export default function App() {
     setRows(inputValue.split("\n").length);
   }, [inputValue]);
 
+  useEffect(() => {
+    const promptPassword = () => {
+      const enteredPassword = prompt("Password:");
+
+      if (enteredPassword !== null) {
+        const hashedPassword = CryptoJS.SHA256(enteredPassword).toString();
+
+        if (hashedPassword === import.meta.env.VITE_SHA25) {
+          setIsAuthenticated(true);
+        } else {
+          alert("Unauthorized.");
+          promptPassword();
+        }
+      }
+    };
+
+    if (!isAuthenticated) {
+      promptPassword();
+    }
+  }, [isAuthenticated]);
+
   const mainContainer = document.getElementById('html-container');
 
-  return (
+  return isAuthenticated ? (
     <div className="min-h-screen overflow-x-hidden overflow-y-auto py-5 bg-gray-800 flex flex-col justify-center items-center scroll-smooth">
       <div id="messages-container" className="p-6 w-[90%] h-[calc(100vh-150px)] bg-blue-50 rounded-xl flex flex-col overflow-x-hidden overflow-y-auto scroll-smooth">
         {messages?.length ? messages?.map((message, index) => {
@@ -189,6 +213,10 @@ export default function App() {
           </div>
         )}
       </div>
+    </div>
+  ) : (
+    <div className="h-screen overflow-hidden bg-gray-800 flex flex-col justify-center items-center">
+      <h1 className="text-white">Access denied</h1>
     </div>
   )
 }
