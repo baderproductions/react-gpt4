@@ -140,7 +140,7 @@ export default function App() {
       if (enteredPassword !== null) {
         const hashedPassword = CryptoJS.SHA256(enteredPassword).toString();
 
-        if (hashedPassword === import.meta.env.VITE_SHA25) {
+        if (hashedPassword === import.meta.env.VITE_SHA256) {
           setIsAuthenticated(true);
         } else {
           alert("Unauthorized.");
