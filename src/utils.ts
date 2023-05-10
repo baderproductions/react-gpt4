@@ -42,7 +42,7 @@ export const useWindowTitleChanger = ({
 	notificationTitle: string;
     interval: number;
 }) => {
-	const intervalRef = useRef<number | null>(null);
+	const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
 	const startChangingTitle = () => {
 		let isNotificationTitle = true;
@@ -54,7 +54,7 @@ export const useWindowTitleChanger = ({
 
 	const stopChangingTitle = () => {
 		if (intervalRef.current) {
-			clearInterval(intervalRef.current);
+			clearInterval(intervalRef.current as unknown as number);
 			document.title = initialTitle;
 		}
 	};
