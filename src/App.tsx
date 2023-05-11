@@ -147,6 +147,7 @@ export default function App() {
 
 	const handleInputKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.shiftKey && e.key === 'Enter') {
+			e.preventDefault();
 			const target = e.target as HTMLTextAreaElement;
 			const cursorPosition = target.selectionStart;
 			setInputValue(
