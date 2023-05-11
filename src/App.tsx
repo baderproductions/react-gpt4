@@ -1,21 +1,23 @@
-import {ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState,} from 'react';
+import {ChangeEvent,  KeyboardEvent, useCallback, useEffect, useRef, useState,} from 'react';
 import axios, {AxiosResponse,} from 'axios';
 import {useTriggerFunctionOnce, useWindowFocus, useWindowTitleChanger,} from './utils';
+// import {Menu, Transition,} from '@headlessui/react';
+// import {FiSettings,} from 'react-icons/fi';
 import logo from '../public/logo.png';
 import CryptoJS from 'crypto-js';
 import hljs from 'highlight.js';
 
 type Message = {
-  from: 'user' | 'gpt';
-  text: string;
+	from: 'user' | 'gpt'
+	text: string
 };
 
 type MessageHistory = {
-  role: string
-  content: string;
+	role: string
+	content: string
 };
 
-type AxiosResponseData = AxiosResponse<Record<string, Record<string, Record<string, Record<string, string>>>>>;
+type AxiosResponseData = AxiosResponse<Record<string, Record<string, Record<string, Record<string, string>>>>>
 
 const trimConversationHistory = (
 	conversationHistory: MessageHistory[],
@@ -52,8 +54,10 @@ export default function App() {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
 	const [rows, setRows] = useState(1);
+	// const [rowsSM, setRowsSM] = useState(SYSTEM_MESSAGE.split('\n').length);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [inputValue, setInputValue] = useState<string>('');
+	// const [inputValueSM, setInputValueSM] = useState<string>(SYSTEM_MESSAGE);
 
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const conversationHistory = useRef<MessageHistory[]>([]);
@@ -76,6 +80,10 @@ export default function App() {
 	useEffect(() => {
 		setRows(inputValue.split('\n').length);
 	}, [inputValue]);
+
+	// useEffect(() => {
+	// 	setRowsSM(inputValueSM.split('\n').length);
+	// }, [inputValueSM]);
 
 	useEffect(() => {
 		const promptPassword = () => {
@@ -139,11 +147,34 @@ export default function App() {
 		setInputValue(e.target.value);
 	}, []);
 
+	// const handleInputChangeSM = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
+	// 	setInputValueSM(e.target.value);
+	// }, []);
+
 	const onTextPaste = useCallback(() => {
 		setTimeout(() => {
 			if (mainContainer) mainContainer.scrollTop = mainContainer.scrollHeight;
 		}, 50);
 	}, [mainContainer]);
+
+	// const handleInputKeyPressSM = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+	// 	if (e.shiftKey && e.key === 'Enter') {
+	// 		e.preventDefault();
+	// 		const target = e.target as HTMLTextAreaElement;
+	// 		const cursorPosition = target.selectionStart;
+	// 		setInputValueSM(
+	// 			inputValue.slice(0, cursorPosition) +
+	// 		'\n' +
+	// 		inputValue.slice(cursorPosition)
+	// 		);
+	// 		setTimeout(() => {
+	// 			target.selectionStart = target.selectionEnd = cursorPosition + 1;
+	// 		}, 0);
+	// 	} else if (e.key === 'Enter' && inputValue.trim() !== '') {
+	// 		// eslint-disable-next-line no-console
+	// 		console.log('setSM');
+	// 	}
+	// };
 
 	const handleInputKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.shiftKey && e.key === 'Enter') {
@@ -152,8 +183,8 @@ export default function App() {
 			const cursorPosition = target.selectionStart;
 			setInputValue(
 				inputValue.slice(0, cursorPosition) +
-          '\n' +
-          inputValue.slice(cursorPosition)
+			'\n' +
+			inputValue.slice(cursorPosition)
 			);
 			setTimeout(() => {
 				target.selectionStart = target.selectionEnd = cursorPosition + 1;
@@ -186,7 +217,49 @@ export default function App() {
 	};
 	
 	return isAuthenticated ? (
-		<div className="min-h-screen overflow-x-hidden overflow-y-auto py-5 bg-gray-800 flex flex-col justify-center items-center scroll-smooth">
+		<div className="min-h-screen overflow-x-hidden overflow-y-auto py-3 bg-gray-800 flex flex-col justify-center items-center scroll-smooth">
+			{/* <Menu
+				as="div"
+				className="relative mb-3">
+				<Menu.Button className="rounded-md bg-black bg-opacity-20 p-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none">
+					<FiSettings className="w-6 h-6 text-white"/>
+				</Menu.Button>
+				<Transition
+					as={ Fragment }
+					enter="transition ease-out duration-100"
+					enterFrom="transform opacity-0 scale-95"
+					enterTo="transform opacity-100 scale-100"
+					leave="transition ease-in duration-75"
+					leaveFrom="transform opacity-100 scale-100"
+					leaveTo="transform opacity-0 scale-95"
+				>
+					<Menu.Items className="absolute left-1/2 -translate-x-1/2 mt-1.5 w-[300px] h-40 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none">
+						<div className="w-full h-full flex flex-col justify-between p-2">
+							<textarea
+								rows={ rowsSM }
+								className="w-full h-3/4 px-2.5 py-1.5 rounded-md resize-none focus:ring-0 focus:outline-none  bg-gray-100 disabled:bg-gray-200 disabled:text-gray-400"
+								value={ inputValueSM }
+								onChange={ handleInputChangeSM }
+								onKeyDown={ handleInputKeyPressSM as unknown as React.KeyboardEventHandler<HTMLTextAreaElement> }
+								// disabled
+								placeholder="System message for GPT to follow..."
+							/>
+							<div className="flex justify-between space-x-4">
+								<button
+									type='button'
+								>
+									CHANGE
+								</button>
+								<button
+									type='button'
+								>
+									REVERT INITIAL
+								</button>
+							</div>
+						</div>
+					</Menu.Items>
+				</Transition>
+			</Menu> */}
 			<div
 				id="messages-container"
 				className="p-4 py-6 w-[90%] h-[calc(100vh-150px)] bg-blue-50 rounded-xl flex flex-col overflow-x-hidden overflow-y-auto scroll-smooth">
