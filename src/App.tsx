@@ -1,7 +1,9 @@
-import {ChangeEvent,  KeyboardEvent, useCallback, useEffect, useRef, useState,} from 'react';
+import {ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState,} from 'react';
 import axios, {AxiosResponse,} from 'axios';
 import {useTriggerFunctionOnce, useWindowFocus, useWindowTitleChanger,} from './utils';
 // import {Menu, Transition,} from '@headlessui/react';
+// import {BiEdit, BiSave,} from 'react-icons/bi';
+// import {MdLockReset,} from 'react-icons/md';
 // import {FiSettings,} from 'react-icons/fi';
 import logo from '../public/logo.png';
 import CryptoJS from 'crypto-js';
@@ -58,6 +60,7 @@ export default function App() {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [inputValue, setInputValue] = useState<string>('');
 	// const [inputValueSM, setInputValueSM] = useState<string>(SYSTEM_MESSAGE);
+	// const [smDisabled, setSMDisabled] = useState<boolean>(true);
 
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const conversationHistory = useRef<MessageHistory[]>([]);
@@ -108,40 +111,59 @@ export default function App() {
 		}
 	}, [isAuthenticated]);
 
-	const gptResponse = useRef<null | ((input: string) => Promise<string | undefined>)>(async (input: string) => {
-		conversationHistory.current.push({
-			role: 'system',
-			content: `The user is user. ${SYSTEM_MESSAGE}`,
-		});
-		conversationHistory.current.push({role: 'user', content: input,});
-		conversationHistory.current = trimConversationHistory(conversationHistory.current, +import.meta.env.VITE_HISTORY_LENGTH);
+	const gptResponse = useRef<null | ((input: string) => Promise<string | undefined>)>(null);
 
-		try {
-			const response: AxiosResponseData = await axios.post(
-				import.meta.env.VITE_OPENAI_API as string,
-				{
-					model: 'gpt-4',
-					messages: conversationHistory.current,
-				},
-				{
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY  as string}`,
-					},
-				}
-			);
-
-			const assistantResponse = response?.data?.choices?.[0]?.message?.content;
-			conversationHistory.current.push({role: 'assistant', content: assistantResponse,});
+	const updateGptResponseFunction = useCallback(() => {
+		gptResponse.current = async (input: string) => {
+			conversationHistory.current.push({
+				role: 'system',
+				content: `The user is user. ${SYSTEM_MESSAGE}`,
+			});
+			conversationHistory.current.push({role: 'user', content: input,});
 			conversationHistory.current = trimConversationHistory(conversationHistory.current, +import.meta.env.VITE_HISTORY_LENGTH);
+	
+			try {
+				const response: AxiosResponseData = await axios.post(
+					import.meta.env.VITE_OPENAI_API as string,
+					{
+						model: 'gpt-4',
+						messages: conversationHistory.current,
+					},
+					{
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY  as string}`,
+						},
+					}
+				);
+	
+				const assistantResponse = response?.data?.choices?.[0]?.message?.content;
+				conversationHistory.current.push({role: 'assistant', content: assistantResponse,});
+				conversationHistory.current = trimConversationHistory(conversationHistory.current, +import.meta.env.VITE_HISTORY_LENGTH);
+	
+				return assistantResponse;
+			} catch (error) {
+				const typedError = error as {data?: {error?: {message?: string;}}};
+				// eslint-disable-next-line no-console
+				console.error(`Error: ${typedError?.data?.error?.message as string}`);
+			}
+		};
+	}, []); // inputValueSM
 
-			return assistantResponse;
-		} catch (error) {
-			const typedError = error as {data?: {error?: {message?: string;}}};
-			// eslint-disable-next-line no-console
-			console.error(`Error: ${typedError?.data?.error?.message as string}`);
-		}
-	});
+	useEffect(() => {
+		updateGptResponseFunction();
+	}, [updateGptResponseFunction]);
+
+	// const toggleSMDisabled = useCallback(() => {
+	// 	conversationHistory.current = [];
+	// 	setSMDisabled(!smDisabled);
+	// }, [smDisabled]);
+
+	// const onReset = useCallback(() => {
+	// 	setInputValueSM(SYSTEM_MESSAGE);
+	// 	conversationHistory.current = [];
+	// 	setSMDisabled(true);
+	// }, []);
 
 	const handleInputChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
 		setInputValue(e.target.value);
@@ -241,19 +263,35 @@ export default function App() {
 								value={ inputValueSM }
 								onChange={ handleInputChangeSM }
 								onKeyDown={ handleInputKeyPressSM as unknown as React.KeyboardEventHandler<HTMLTextAreaElement> }
-								// disabled
+								disabled={ smDisabled }
 								placeholder="System message for GPT to follow..."
 							/>
-							<div className="flex justify-between space-x-4">
+							<div className="flex justify-between space-x-4 mt-2">
 								<button
 									type='button'
-								>
-									CHANGE
+									onClick={ toggleSMDisabled }
+									className="h-max flex space-x-2 rounded-md bg-black p-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none"
+								>	
+									{smDisabled ? (
+										<>
+											<BiEdit className="w-4 h-4 text-white"/>
+											<span>EDIT</span>
+										</>
+									) : (
+										<>
+											<BiSave className="w-4 h-4 text-white"/>
+											<span>SAVE</span>
+										</>
+									)}
+									
 								</button>
 								<button
 									type='button'
+									onClick={ onReset }
+									className="h-max flex space-x-2 rounded-md bg-black p-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none"
 								>
-									REVERT INITIAL
+									<MdLockReset className="w-4 h-4 text-white"/>
+									<span>RESET</span>
 								</button>
 							</div>
 						</div>
