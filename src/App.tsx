@@ -1,10 +1,10 @@
-import {ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState,} from 'react';
+import {ChangeEvent, Fragment, KeyboardEvent, useCallback, useEffect, useRef, useState,} from 'react';
 import axios, {AxiosResponse,} from 'axios';
 import {useTriggerFunctionOnce, useWindowFocus, useWindowTitleChanger,} from './utils';
-// import {Menu, Transition,} from '@headlessui/react';
-// import {BiEdit, BiSave,} from 'react-icons/bi';
-// import {MdLockReset,} from 'react-icons/md';
-// import {FiSettings,} from 'react-icons/fi';
+import {BiEdit, BiInfoCircle, BiSave,} from 'react-icons/bi';
+import {Popover, Transition,} from '@headlessui/react';
+import {MdLockReset,} from 'react-icons/md';
+import {FiSettings,} from 'react-icons/fi';
 import logo from '../public/logo.png';
 import CryptoJS from 'crypto-js';
 import hljs from 'highlight.js';
@@ -56,11 +56,11 @@ export default function App() {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
 	const [rows, setRows] = useState(1);
-	// const [rowsSM, setRowsSM] = useState(SYSTEM_MESSAGE.split('\n').length);
+	const [rowsSM, setRowsSM] = useState(SYSTEM_MESSAGE.split('\n').length);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [inputValue, setInputValue] = useState<string>('');
-	// const [inputValueSM, setInputValueSM] = useState<string>(SYSTEM_MESSAGE);
-	// const [smDisabled, setSMDisabled] = useState<boolean>(true);
+	const [inputValueSM, setInputValueSM] = useState<string>(SYSTEM_MESSAGE);
+	const [smDisabled, setSMDisabled] = useState<boolean>(true);
 
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const conversationHistory = useRef<MessageHistory[]>([]);
@@ -84,9 +84,9 @@ export default function App() {
 		setRows(inputValue.split('\n').length);
 	}, [inputValue]);
 
-	// useEffect(() => {
-	// 	setRowsSM(inputValueSM.split('\n').length);
-	// }, [inputValueSM]);
+	useEffect(() => {
+		setRowsSM(inputValueSM.split('\n').length);
+	}, [inputValueSM]);
 
 	useEffect(() => {
 		const promptPassword = () => {
@@ -117,7 +117,7 @@ export default function App() {
 		gptResponse.current = async (input: string) => {
 			conversationHistory.current.push({
 				role: 'system',
-				content: `The user is user. ${SYSTEM_MESSAGE}`,
+				content: `The user is user. ${inputValueSM}`,
 			});
 			conversationHistory.current.push({role: 'user', content: input,});
 			conversationHistory.current = trimConversationHistory(conversationHistory.current, +import.meta.env.VITE_HISTORY_LENGTH);
@@ -148,30 +148,30 @@ export default function App() {
 				console.error(`Error: ${typedError?.data?.error?.message as string}`);
 			}
 		};
-	}, []); // inputValueSM
+	}, [inputValueSM]);
 
 	useEffect(() => {
 		updateGptResponseFunction();
 	}, [updateGptResponseFunction]);
 
-	// const toggleSMDisabled = useCallback(() => {
-	// 	conversationHistory.current = [];
-	// 	setSMDisabled(!smDisabled);
-	// }, [smDisabled]);
+	const toggleSMDisabled = useCallback(() => {
+		conversationHistory.current = [];
+		setSMDisabled(!smDisabled);
+	}, [smDisabled]);
 
-	// const onReset = useCallback(() => {
-	// 	setInputValueSM(SYSTEM_MESSAGE);
-	// 	conversationHistory.current = [];
-	// 	setSMDisabled(true);
-	// }, []);
+	const onReset = useCallback(() => {
+		setInputValueSM(SYSTEM_MESSAGE);
+		conversationHistory.current = [];
+		setSMDisabled(true);
+	}, []);
 
 	const handleInputChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
 		setInputValue(e.target.value);
 	}, []);
 
-	// const handleInputChangeSM = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
-	// 	setInputValueSM(e.target.value);
-	// }, []);
+	const handleInputChangeSM = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
+		setInputValueSM(e.target.value);
+	}, []);
 
 	const onTextPaste = useCallback(() => {
 		setTimeout(() => {
@@ -179,24 +179,21 @@ export default function App() {
 		}, 50);
 	}, [mainContainer]);
 
-	// const handleInputKeyPressSM = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-	// 	if (e.shiftKey && e.key === 'Enter') {
-	// 		e.preventDefault();
-	// 		const target = e.target as HTMLTextAreaElement;
-	// 		const cursorPosition = target.selectionStart;
-	// 		setInputValueSM(
-	// 			inputValue.slice(0, cursorPosition) +
-	// 		'\n' +
-	// 		inputValue.slice(cursorPosition)
-	// 		);
-	// 		setTimeout(() => {
-	// 			target.selectionStart = target.selectionEnd = cursorPosition + 1;
-	// 		}, 0);
-	// 	} else if (e.key === 'Enter' && inputValue.trim() !== '') {
-	// 		// eslint-disable-next-line no-console
-	// 		console.log('setSM');
-	// 	}
-	// };
+	const handleInputKeyPressSM = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+		if (e.shiftKey && e.key === 'Enter') {
+			e.preventDefault();
+			const target = e.target as HTMLTextAreaElement;
+			const cursorPosition = target.selectionStart;
+			setInputValueSM(
+				inputValueSM.slice(0, cursorPosition) +
+			'\n' +
+			inputValueSM.slice(cursorPosition)
+			);
+			setTimeout(() => {
+				target.selectionStart = target.selectionEnd = cursorPosition + 1;
+			}, 0);
+		}
+	};
 
 	const handleInputKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.shiftKey && e.key === 'Enter') {
@@ -240,12 +237,12 @@ export default function App() {
 	
 	return isAuthenticated ? (
 		<div className="min-h-screen overflow-x-hidden overflow-y-auto py-3 bg-gray-800 flex flex-col justify-center items-center scroll-smooth">
-			{/* <Menu
+			<Popover
 				as="div"
 				className="relative mb-3">
-				<Menu.Button className="rounded-md bg-black bg-opacity-20 p-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none">
+				<Popover.Button className="rounded-md bg-black bg-opacity-20 p-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none">
 					<FiSettings className="w-6 h-6 text-white"/>
-				</Menu.Button>
+				</Popover.Button>
 				<Transition
 					as={ Fragment }
 					enter="transition ease-out duration-100"
@@ -255,8 +252,14 @@ export default function App() {
 					leaveFrom="transform opacity-100 scale-100"
 					leaveTo="transform opacity-0 scale-95"
 				>
-					<Menu.Items className="absolute left-1/2 -translate-x-1/2 mt-1.5 w-[300px] h-40 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none">
+					<Popover.Panel className="absolute left-1/2 -translate-x-1/2 mt-1.5 w-[300px] h-40 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none">
 						<div className="w-full h-full flex flex-col justify-between p-2">
+							<label className='flex items-center text-gray-500 text-xs mb-1'>
+								<BiInfoCircle
+									className="w-4 h-4 text-gray-600 mr-1"
+									title="The system message helps set the behavior of the assistant."/>
+								GPT System Message
+							</label>
 							<textarea
 								rows={ rowsSM }
 								className="w-full h-3/4 px-2.5 py-1.5 rounded-md resize-none focus:ring-0 focus:outline-none  bg-gray-100 disabled:bg-gray-200 disabled:text-gray-400"
@@ -264,40 +267,42 @@ export default function App() {
 								onChange={ handleInputChangeSM }
 								onKeyDown={ handleInputKeyPressSM as unknown as React.KeyboardEventHandler<HTMLTextAreaElement> }
 								disabled={ smDisabled }
-								placeholder="System message for GPT to follow..."
+								placeholder="The system message helps set the behavior of the assistant"
 							/>
 							<div className="flex justify-between space-x-4 mt-2">
 								<button
 									type='button'
 									onClick={ toggleSMDisabled }
-									className="h-max flex space-x-2 rounded-md bg-black p-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none"
+									className="h-max flex items-center space-x-2 rounded-md bg-gray-700 p-2 text-sm font-medium text-white hover:bg-opacity-90 focus:outline-none"
 								>	
 									{smDisabled ? (
 										<>
-											<BiEdit className="w-4 h-4 text-white"/>
-											<span>EDIT</span>
+											<BiEdit className="w-5 h-5 text-white"/>
+											<span className='text-sm'>EDIT</span>
 										</>
 									) : (
-										<>
-											<BiSave className="w-4 h-4 text-white"/>
-											<span>SAVE</span>
-										</>
+										<Popover.Button
+											as="span"
+											className="h-max flex items-center space-x-2">
+											<BiSave className="w-5 h-5 text-white"/>
+											<span className='text-sm'>SAVE</span>
+										</Popover.Button>
 									)}
 									
 								</button>
 								<button
 									type='button'
 									onClick={ onReset }
-									className="h-max flex space-x-2 rounded-md bg-black p-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none"
+									className="h-max flex items-center space-x-2 rounded-md bg-gray-700 p-2 text-sm font-medium text-white hover:bg-opacity-90 focus:outline-none"
 								>
-									<MdLockReset className="w-4 h-4 text-white"/>
-									<span>RESET</span>
+									<MdLockReset className="w-5 h-5 text-white"/>
+									<span className='text-sm'>RESET</span>
 								</button>
 							</div>
 						</div>
-					</Menu.Items>
+					</Popover.Panel>
 				</Transition>
-			</Menu> */}
+			</Popover>
 			<div
 				id="messages-container"
 				className="p-4 py-6 w-[90%] h-[calc(100vh-150px)] bg-blue-50 rounded-xl flex flex-col overflow-x-hidden overflow-y-auto scroll-smooth">
