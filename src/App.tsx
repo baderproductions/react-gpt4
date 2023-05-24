@@ -50,7 +50,7 @@ const HighlightedCode = ({code,}: { code: string }) => {
 	);
 };
 
-const SYSTEM_MESSAGE = 'You are an AI programming assistant. Follow the user requirements carefully & to the letter. Then output the code in a single code block. Minimize any other prose.';
+const SYSTEM_MESSAGE = 'You are an AI programming assistant. Follow the user requirements carefully & to the letter. Then output the code in a single code block. Use typescript instead of javascript and tsx instead of jsx when asked javascript related questions. Minimize any other prose.';
 
 export default function App() {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
