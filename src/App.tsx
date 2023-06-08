@@ -236,11 +236,11 @@ export default function App() {
 	};
 	
 	return isAuthenticated ? (
-		<div className="min-h-screen overflow-x-hidden overflow-y-auto py-3 bg-gray-800 flex flex-col justify-center items-center scroll-smooth">
+		<div className="min-h-screen overflow-x-hidden overflow-y-auto py-3 bg-[#1e1e1e] flex flex-col justify-center items-center scroll-smooth">
 			<Popover
 				as="div"
 				className="relative mb-3">
-				<Popover.Button className="rounded-md bg-black bg-opacity-20 p-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none">
+				<Popover.Button className="rounded-md bg-black p-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none">
 					<FiSettings className="w-6 h-6 text-white"/>
 				</Popover.Button>
 				<Transition
@@ -273,7 +273,7 @@ export default function App() {
 								<button
 									type='button'
 									onClick={ toggleSMDisabled }
-									className="h-max flex items-center space-x-2 rounded-md bg-gray-700 p-2 text-sm font-medium text-white hover:bg-opacity-90 focus:outline-none"
+									className="h-max flex items-center space-x-2 rounded-md bg-[#1e1e1e] p-2 text-sm font-medium text-white hover:bg-opacity-90 focus:outline-none"
 								>	
 									{smDisabled ? (
 										<>
@@ -293,7 +293,7 @@ export default function App() {
 								<button
 									type='button'
 									onClick={ onReset }
-									className="h-max flex items-center space-x-2 rounded-md bg-gray-700 p-2 text-sm font-medium text-white hover:bg-opacity-90 focus:outline-none"
+									className="h-max flex items-center space-x-2 rounded-md bg-[#1e1e1e] p-2 text-sm font-medium text-white hover:bg-opacity-90 focus:outline-none"
 								>
 									<MdLockReset className="w-5 h-5 text-white"/>
 									<span className='text-sm'>RESET</span>
@@ -324,7 +324,7 @@ export default function App() {
 							)}
 							{message.from === 'user' && <div className="flex-none w-9 h-9"/>}
 							<div
-								className={ `flex rounded-xl p-2 pr-4 ${message.from === 'gpt' ? 'bg-white shadow-[0_0_0_1px_#AAA] mr-auto rounded-bl-none' :  'bg-white shadow-[0_0_0_1px_#25D366] ml-auto justify-end rounded-br-none my-3' } ${message.from === 'gpt' && !message.text ? 'items-center shadow-[0_0_0_1px_#FFAFAE]' : ''}` }>
+								className={ `flex rounded-xl p-2 pr-4 ${message.from === 'gpt' ? 'bg-[#1e1e1e] shadow-[0_0_0_1px_#AAA] mr-auto rounded-bl-none' :  'bg-[#1e1e1e] shadow-[0_0_0_1px_#25D366] ml-auto justify-end rounded-br-none my-3' } ${message.from === 'gpt' && !message.text ? 'items-center shadow-[0_0_0_1px_#FFAFAE]' : ''}` }>
 								<span className={ `w-full ${!message.text ? 'text-red-400' : ''}` }>
 									{message.text ? <HighlightedCode code={ message.text }/> : 'There was an error'}
 								</span>
