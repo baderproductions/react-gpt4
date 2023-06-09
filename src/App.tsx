@@ -236,7 +236,7 @@ export default function App() {
 	};
 	
 	return isAuthenticated ? (
-		<div className="min-h-screen overflow-x-hidden overflow-y-auto py-3 bg-[#1e1e1e] flex flex-col justify-center items-center scroll-smooth">
+		<div className="min-h-screen overflow-x-hidden overflow-y-auto py-3 bg-black flex flex-col justify-center items-center scroll-smooth">
 			<Popover
 				as="div"
 				className="relative mb-3">
@@ -273,7 +273,7 @@ export default function App() {
 								<button
 									type='button'
 									onClick={ toggleSMDisabled }
-									className="h-max flex items-center space-x-2 rounded-md bg-[#1e1e1e] p-2 text-sm font-medium text-white hover:bg-opacity-90 focus:outline-none"
+									className="h-max flex items-center space-x-2 rounded-md bg-black p-2 text-sm font-medium text-white hover:bg-opacity-90 focus:outline-none"
 								>	
 									{smDisabled ? (
 										<>
@@ -293,7 +293,7 @@ export default function App() {
 								<button
 									type='button'
 									onClick={ onReset }
-									className="h-max flex items-center space-x-2 rounded-md bg-[#1e1e1e] p-2 text-sm font-medium text-white hover:bg-opacity-90 focus:outline-none"
+									className="h-max flex items-center space-x-2 rounded-md bg-black p-2 text-sm font-medium text-white hover:bg-opacity-90 focus:outline-none"
 								>
 									<MdLockReset className="w-5 h-5 text-white"/>
 									<span className='text-sm'>RESET</span>
@@ -305,7 +305,7 @@ export default function App() {
 			</Popover>
 			<div
 				id="messages-container"
-				className="p-4 py-6 w-[90%] h-[calc(100vh-150px)] bg-blue-50 rounded-xl flex flex-col overflow-x-hidden overflow-y-auto scroll-smooth">
+				className="p-4 py-4 w-[90%] h-[calc(100vh-150px)] shadow-[inset_0_0_6px_0_#00000040] border border-gray-200 bg-gray-200 rounded-xl flex flex-col overflow-x-hidden overflow-y-auto scroll-smooth">
 				{messages?.length ? messages?.map((message, index) => {
 					return (
 						<div 
@@ -324,7 +324,7 @@ export default function App() {
 							)}
 							{message.from === 'user' && <div className="flex-none w-9 h-9"/>}
 							<div
-								className={ `flex rounded-xl p-2 pr-4 ${message.from === 'gpt' ? 'bg-[#1e1e1e] shadow-[0_0_0_1px_#AAA] mr-auto rounded-bl-none' :  'bg-[#1e1e1e] shadow-[0_0_0_1px_#25D366] ml-auto justify-end rounded-br-none my-3' } ${message.from === 'gpt' && !message.text ? 'items-center shadow-[0_0_0_1px_#FFAFAE]' : ''}` }>
+								className={ `flex rounded-xl p-2 pr-4 ${message.from === 'gpt' ? 'bg-[#1e1e1e] shadow-[0_0_0_2px_#AAA] mr-auto rounded-bl-none' :  'bg-[#1e1e1e] shadow-[0_0_0_2px_#a0c1fa] ml-auto justify-end rounded-br-none my-4' } ${message.from === 'gpt' && !message.text ? 'items-center shadow-[0_0_0_1px_#FFAFAE]' : ''}` }>
 								<span className={ `w-full ${!message.text ? 'text-red-400' : ''}` }>
 									{message.text ? <HighlightedCode code={ message.text }/> : 'There was an error'}
 								</span>
