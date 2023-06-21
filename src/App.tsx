@@ -162,6 +162,7 @@ export default function App() {
 	const onReset = useCallback(() => {
 		setInputValueSM(SYSTEM_MESSAGE);
 		conversationHistory.current = [];
+		setMessages([]);
 		setSMDisabled(true);
 	}, []);
 
